@@ -5,8 +5,8 @@ const db = require('../db')
 const User = db.define('user', {
   email: {
     type: Sequelize.STRING,
-    unique: true,
-    allowNull: false
+    unique: true
+    // allowNull: false
   },
   password: {
     type: Sequelize.STRING,
@@ -24,7 +24,13 @@ const User = db.define('user', {
       return () => this.getDataValue('salt')
     }
   },
-  googleId: {
+  spotifyId: {
+    type: Sequelize.STRING
+  },
+  username: {
+    type: Sequelize.STRING
+  },
+  displayName: {
     type: Sequelize.STRING
   }
 })
