@@ -7,34 +7,34 @@ module.exports = router
 if (!process.env.SPOTIFY_CLIENT_ID || !process.env.SPOTIFY_CLIENT_SECRET) {
   console.log('Spotify client ID / secret not found. Skipping Spotify OAuth.')
 } else {
-  const spotifyCredentials = {
+  const spotifyConfig = {
     clientID: process.env.SPOTIFY_CLIENT_ID,
     clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
-    callbackURL: process.env.SPOTIFY_CALLBACK_URL
+    callbackURL: process.env.SPOTIFY_CALLBACK_URL,
+    passReqToCallback: true
   }
-  console.log(spotifyCredentials)
+
   const strategy = new SpotifyStrategy(
-    spotifyCredentials,
-    (accessToken, refreshToken, expires_in, profile, done) => {
+    spotifyConfig,
+    (req, accessToken, refreshToken, expires_in, profile, done) => {
       const spotifyId = profile.id
       const email = profile.emails[0].value
       const imgUrl = profile.photos[0]?.value
       const username = profile.username
       const displayName = profile?.displayName
 
-      console.log({
-        spotifyId,
-        email,
-        imgUrl,
-        username,
-        displayName
-      })
-
       User.findOrCreate({
         where: {spotifyId},
         defaults: {email, imgUrl, username, displayName}
       })
-        .then(([user]) => done(null, user))
+        .then(([user]) => {
+          req.session.accessToken = accessToken
+          req.session.refreshToken = refreshToken
+          req.session.accessTokenExpirationDate = new Date(
+            Date.now() + expires_in * 1000
+          )
+          return done(null, user)
+        })
         .catch(done)
     }
   )
