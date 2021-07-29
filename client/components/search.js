@@ -4,6 +4,7 @@ import TextField from '@material-ui/core/TextField'
 import Grid from '@material-ui/core/Grid'
 import SearchIcon from '@material-ui/icons/Search'
 import axios from 'axios'
+import {SearchResult} from './'
 
 const useStyles = makeStyles(theme => ({
   margin: {
@@ -14,15 +15,8 @@ const useStyles = makeStyles(theme => ({
 function Search() {
   const classes = useStyles()
 
-  // const accessToken = useAuth(code)
   const [search, setSearch] = useState('')
   const [searchResults, setSearchResults] = useState([])
-  const [playingTrack, setPlayingTrack] = useState()
-
-  function chooseTrack(track) {
-    setPlayingTrack(track)
-    setSearch('')
-  }
 
   useEffect(
     () => {
@@ -60,6 +54,9 @@ function Search() {
             />
           </Grid>
         </Grid>
+        {searchResults.map(track => (
+          <SearchResult track={track} key={track.uri} />
+        ))}
       </div>
     </div>
   )
